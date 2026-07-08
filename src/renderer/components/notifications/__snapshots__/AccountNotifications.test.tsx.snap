@@ -847,7 +847,7 @@ exports[`renderer/components/notifications/AccountNotifications.tsx > should ren
           >
             <span
               class="pr-1 prc-Text-Text-9mHv3"
-              title="You're watching the repository."
+              title="You're watching the repository. Author: gitify-app."
             >
               Updated
             </span>

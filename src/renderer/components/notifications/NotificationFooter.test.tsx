@@ -63,6 +63,65 @@ describe('renderer/components/notifications/NotificationFooter.tsx', () => {
     expect(tree.container).toMatchSnapshot();
   });
 
+  it.each(['Issue', 'PullRequest'] as const)(
+    'should include %s authors in reason title',
+    (type) => {
+      const props: NotificationFooterProps = {
+        notification: {
+          ...mockGitifyNotification,
+          reason: {
+            code: 'review_requested',
+            title: 'Review Requested',
+            description:
+              "You, or a team you're a member of, were requested to review a pull request.",
+          },
+          subject: {
+            ...mockGitifyNotification.subject,
+            author: {
+              login: 'thread-author',
+              htmlUrl: 'https://github.com/thread-author' as Link,
+              avatarUrl: 'https://avatars.githubusercontent.com/u/123?v=4' as Link,
+              type: 'User' as GitifyNotificationUser['type'],
+            },
+            type,
+          },
+        },
+      };
+
+      renderWithProviders(<NotificationFooter {...props} />);
+
+      expect(screen.getByText('Review Requested')).toHaveAttribute(
+        'title',
+        "You, or a team you're a member of, were requested to review a pull request. Author: thread-author.",
+      );
+    },
+  );
+
+  it('should not include authors in reason titles for other notification types', () => {
+    const props: NotificationFooterProps = {
+      notification: {
+        ...mockGitifyNotification,
+        reason: {
+          code: 'review_requested',
+          title: 'Review Requested',
+          description:
+            "You, or a team you're a member of, were requested to review a pull request.",
+        },
+        subject: {
+          ...mockGitifyNotification.subject,
+          type: 'Release',
+        },
+      },
+    };
+
+    renderWithProviders(<NotificationFooter {...props} />);
+
+    expect(screen.getByText('Review Requested')).toHaveAttribute(
+      'title',
+      "You, or a team you're a member of, were requested to review a pull request.",
+    );
+  });
+
   it('should open notification user profile', async () => {
     const openExternalLinkSpy = vi.spyOn(comms, 'openExternalLink').mockImplementation(vi.fn());
 
